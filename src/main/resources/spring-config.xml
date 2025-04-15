@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd">
+
+
+    <bean id="bankService" class="org.example.BankService" />
+
+    <bean id="securityAspect" class="org.example.SecurityAspect" />
+    <bean id="transactionAspect" class="org.example.TransactionAspect" />
+
+    <aop:config>
+        <aop:aspect ref="securityAspect">
+            <aop:pointcut id="secureOperation"
+                          expression="execution(* org.example.BankService.transfer(..))"/>
+            <aop:before pointcut-ref="secureOperation" method="checkAccess"/>
+        </aop:aspect>
+
+        <aop:aspect ref="transactionAspect">
+            <aop:pointcut id="transactionalOperation"
+                          expression="execution(* org.example.BankService.*(..))"/>
+            <aop:around pointcut-ref="transactionalOperation" method="manageTransaction"/>
+        </aop:aspect>
+    </aop:config>
+</beans>
